@@ -27,6 +27,14 @@ class SeekerSpecBasedTest {
         assertThat(seeker.getBalance()).isEqualTo(Seeker.MAX_SINGLE_TOP_UP);
     }
 
+    @Test
+    @DisplayName("Adding 250 SEK to a new seeker gives a 250.00 balance")
+    void addingFundsWorks() {
+        Seeker seeker = new Seeker("you@example.com", "You", "0701234567");  // Arrange
+        seeker.addFunds(250.00);                                              // Act
+        assertThat(seeker.getBalance()).isEqualTo(250.00);                   // Assert
+    }
+
     // TODO (EP): one valid + one invalid equivalence class for email, name, and phone (FR-1.1).
     // TODO (BVA): just-below / at / just-above the 10.00 minimum top-up (FR-1.3).
     // TODO (BVA): a top-up that would push the balance above 20000.00 is rejected (FR-1.3).
