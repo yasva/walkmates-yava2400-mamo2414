@@ -35,11 +35,12 @@ class SeekerSpecBasedTest {
         assertThat(seeker.getBalance()).isEqualTo(250.00);                   // Assert
     }
 
-    // TODO (EP): one valid + one invalid equivalence class for email, name, and phone (FR-1.1).
+    // TODO (EP): email equivalence classes (FR-1.1)
 
     @Test
     @DisplayName("Valid email format and length is accepted")
     void validEmailIsAccepted() {
+        // Valid equivalence class
         Seeker seeker = new Seeker(
                 "sam@example.com",
                 "Sam",
@@ -49,15 +50,58 @@ class SeekerSpecBasedTest {
         assertThat(seeker).isNotNull();
     }
 
+    @Test
+    @DisplayName("Email without @ is rejected")
+    void emailWithoutAtIsRejected() {
+        // Invalid equivalence class: missing @
+        assertThrows(IllegalArgumentException.class,
+                () -> new Seeker(
+                        "samexample.com",
+                        "Sam",
+                        "0707654321"
+                ));
+    }
+
+    @Test
+    @DisplayName("Email with empty local part is rejected")
+    void emailWithEmptyLocalPartIsRejected() {
+        // Invalid equivalence class: empty local part
+        assertThrows(IllegalArgumentException.class,
+                () -> new Seeker(
+                        "@example.com",
+                        "Sam",
+                        "0707654321"
+                ));
+    }
+
+    @Test
+    @DisplayName("Email with domain without dot is rejected")
+    void emailWithoutDomainDotIsRejected() {
+        // Invalid equivalence class: domain without dot
+        assertThrows(IllegalArgumentException.class,
+                () -> new Seeker(
+                        "sam@example",
+                        "Sam",
+                        "0707654321"
+                ));
+    }
+
+    @Test
+    @DisplayName("Email longer than 254 characters is rejected")
+    void emailLongerThan254CharactersIsRejected() {
+        // Invalid equivalence class: email exceeds maximum length
+        String email = "a".repeat(243) + "@example.com"; // 255 characters
+
+        assertThrows(IllegalArgumentException.class,
+                () -> new Seeker(
+                        email,
+                        "Sam",
+                        "0707654321"
+                ));
+    }
+
     // TODO (BVA): just-below / at / just-above the 10.00 minimum top-up (FR-1.3).
     // TODO (BVA): a top-up that would push the balance above 20000.00 is rejected (FR-1.3).
     // TODO (Decision table): expected fee + max-bookings for each trust tier (FR-1.2).
 
-    @Test
-    @DisplayName("TODO: replace me — invalid email is rejected at registration")
-    void invalidEmailIsRejected() {
-        // Example of the shape; expand into your full EP set.
-        assertThrows(IllegalArgumentException.class,
-                () -> new Seeker("not-an-email", "Sam", "0707654321"));
-    }
 }
