@@ -265,6 +265,36 @@ class SeekerSpecBasedTest {
 
         assertThat(seeker.getBalance()).isEqualTo(10.01);
     }
+    // TODO (BVA): just-below / at / just-above the 5000.00 single top-up maximum (FR-1.3).
+
+    @Test
+    @DisplayName("Top-up just below 5000.00 SEK is accepted")
+    void topUpJustBelowSingleMaximumIsAccepted() {
+        Seeker seeker = new Seeker(
+                "sam@example.com",
+                "Sam",
+                "0707654321"
+        );
+
+        seeker.addFunds(4999.99);
+
+        assertThat(seeker.getBalance()).isEqualTo(4999.99);
+    }
+
+// Exact boundary 5000.00 is already covered by topUpAtSingleMaximumIsAccepted()
+
+    @Test
+    @DisplayName("Top-up just above 5000.00 SEK is rejected")
+    void topUpJustAboveSingleMaximumIsRejected() {
+        Seeker seeker = new Seeker(
+                "sam@example.com",
+                "Sam",
+                "0707654321"
+        );
+
+        assertThrows(IllegalArgumentException.class,
+                () -> seeker.addFunds(5000.01));
+    }
 
     // TODO (BVA): a top-up that would push the balance above 20000.00 is rejected (FR-1.3).
     // TODO (Decision table): expected fee + max-bookings for each trust tier (FR-1.2).
