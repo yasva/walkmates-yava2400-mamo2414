@@ -171,7 +171,7 @@ class SeekerSpecBasedTest {
                 () -> seeker.addFunds(5.00));
     }
 
-      // TODO (EP): phone number equivalence classes (FR-1.1)
+    // TODO (EP): phone number equivalence classes (FR-1.1)
 
     @Test
     @DisplayName("Valid Swedish phone number is accepted")
@@ -187,7 +187,7 @@ class SeekerSpecBasedTest {
 
     @Test
     @DisplayName("Valid international Swedish phone number is accepted")
-    // Valid equivalence class: international Swedish format
+        // Valid equivalence class: international Swedish format
     void validInternationalPhoneNumberIsAccepted() {
         Seeker seeker = new Seeker(
                 "sam@example.com",
@@ -200,7 +200,7 @@ class SeekerSpecBasedTest {
 
     @Test
     @DisplayName("Invalid phone number format is rejected")
-    // Invalid equivalence class
+        // Invalid equivalence class
     void invalidPhoneNumberIsRejected() {
         assertThrows(IllegalArgumentException.class,
                 () -> new Seeker(
@@ -210,6 +210,18 @@ class SeekerSpecBasedTest {
                 ));
     }
 
+    @Test
+    @DisplayName("Top-up above the single-transaction maximum is rejected")
+    void topUpAboveSingleMaximumIsRejected() {
+        Seeker seeker = new Seeker(
+                "sam@example.com",
+                "Sam",
+                "0707654321"
+        );
+
+        assertThrows(IllegalArgumentException.class,
+                () -> seeker.addFunds(6000.00));
+    }
     // TODO (BVA): just-below / at / just-above the 10.00 minimum top-up (FR-1.3).
     // TODO (BVA): a top-up that would push the balance above 20000.00 is rejected (FR-1.3).
     // TODO (Decision table): expected fee + max-bookings for each trust tier (FR-1.2).
