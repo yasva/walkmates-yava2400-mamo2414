@@ -187,8 +187,8 @@ class SeekerSpecBasedTest {
 
     @Test
     @DisplayName("Valid international Swedish phone number is accepted")
-        // Valid equivalence class: international Swedish format
     void validInternationalPhoneNumberIsAccepted() {
+        // Valid equivalence class: international Swedish format
         Seeker seeker = new Seeker(
                 "sam@example.com",
                 "Sam",
@@ -200,8 +200,8 @@ class SeekerSpecBasedTest {
 
     @Test
     @DisplayName("Invalid phone number format is rejected")
-        // Invalid equivalence class
     void invalidPhoneNumberIsRejected() {
+        // Invalid equivalence class
         assertThrows(IllegalArgumentException.class,
                 () -> new Seeker(
                         "sam@example.com",
@@ -222,7 +222,50 @@ class SeekerSpecBasedTest {
         assertThrows(IllegalArgumentException.class,
                 () -> seeker.addFunds(6000.00));
     }
+    
     // TODO (BVA): just-below / at / just-above the 10.00 minimum top-up (FR-1.3).
+
+    @Test
+    @DisplayName("Top-up just below 10.00 SEK is rejected")
+    void topUpJustBelowMinimumIsRejected() {
+        Seeker seeker = new Seeker(
+                "sam@example.com",
+                "Sam",
+                "0707654321"
+        );
+
+        assertThrows(IllegalArgumentException.class,
+                () -> seeker.addFunds(9.99));
+    }
+
+    @Test
+    @DisplayName("Top-up exactly at 10.00 SEK is accepted")
+    void topUpAtMinimumIsAccepted() {
+        Seeker seeker = new Seeker(
+                "sam@example.com",
+                "Sam",
+                "0707654321"
+        );
+
+        seeker.addFunds(10.00);
+
+        assertThat(seeker.getBalance()).isEqualTo(10.00);
+    }
+
+    @Test
+    @DisplayName("Top-up just above 10.00 SEK is accepted")
+    void topUpJustAboveMinimumIsAccepted() {
+        Seeker seeker = new Seeker(
+                "sam@example.com",
+                "Sam",
+                "0707654321"
+        );
+
+        seeker.addFunds(10.01);
+
+        assertThat(seeker.getBalance()).isEqualTo(10.01);
+    }
+
     // TODO (BVA): a top-up that would push the balance above 20000.00 is rejected (FR-1.3).
     // TODO (Decision table): expected fee + max-bookings for each trust tier (FR-1.2).
 
