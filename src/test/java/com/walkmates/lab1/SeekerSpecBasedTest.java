@@ -382,4 +382,25 @@ class SeekerSpecBasedTest {
         assertThat(seeker.getTrustTier().getPlatformFee()).isEqualTo(0.12);
     }
 
+    @Test
+    @DisplayName("TRUSTED trust tier has 5 max bookings and 8% platform fee")
+    void trustedTrustTierHasCorrectValues() {
+       Seeker seeker = new Seeker("sam@example.com", "Sam", "0707654321");
+
+       seeker.setTrustTier(TrustTier.TRUSTED);
+
+       assertThat(seeker.getMaxConcurrentBookings()).isEqualTo(5);
+       assertThat(seeker.getTrustTier().getPlatformFee()).isEqualTo(0.08);
+    }
+
+    @Test
+    @DisplayName("PRO_SITTER trust tier has 10 max bookings and 5% platform fee")
+    void proSitterTrustTierHasCorrectValues() {
+       Seeker seeker = new Seeker("sam@example.com", "Sam", "0707654321");
+
+       seeker.setTrustTier(TrustTier.PRO_SITTER);
+
+       assertThat(seeker.getMaxConcurrentBookings()).isEqualTo(10);
+       assertThat(seeker.getTrustTier().getPlatformFee()).isEqualTo(0.05);
+    }
 }
