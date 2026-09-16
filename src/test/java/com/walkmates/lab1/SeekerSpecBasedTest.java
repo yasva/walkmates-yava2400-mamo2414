@@ -13,6 +13,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  * <p>Design your tests on paper first (equivalence partitions, boundary values, decision table)
  * from {@code docs/REQUIREMENTS.md} FR-1.1 / FR-1.3 / FR-1.2, then implement them here. One
  * worked example is provided; the {@code TODO}s are yours.</p>
+ *
+ *  @author Yasaman Vallaee
+ *  @author Marjan Motafeghizenoz
  */
 class SeekerSpecBasedTest {
 
@@ -31,7 +34,7 @@ class SeekerSpecBasedTest {
     @DisplayName("Adding 250 SEK to a new seeker gives a 250.00 balance")
     void addingFundsWorks() {
         Seeker seeker = new Seeker("you@example.com", "You", "0701234567");  // Arrange
-        seeker.addFunds(250.00);                                              // Act
+        seeker.addFunds(250.00);                                             // Act
         assertThat(seeker.getBalance()).isEqualTo(250.00);                   // Assert
     }
 
@@ -99,6 +102,57 @@ class SeekerSpecBasedTest {
                         "0707654321"
                 ));
     }
+
+
+    // TODO (EP): display name equivalence classes (FR-1.1)
+
+    @Test
+    @DisplayName("Valid display name is accepted")
+    void validDisplayNameIsAccepted() {
+        Seeker seeker = new Seeker(
+                "sam@example.com",
+                "Sam Lee",
+                "0707654321"
+        );
+
+        assertThat(seeker).isNotNull();
+    }
+
+    @Test
+    @DisplayName("Display name shorter than 2 characters is rejected")
+    void displayNameTooShortIsRejected() {
+        assertThrows(IllegalArgumentException.class,
+                () -> new Seeker(
+                        "sam@example.com",
+                        "A",
+                        "0707654321"
+                ));
+    }
+
+    @Test
+    @DisplayName("Display name longer than 40 characters is rejected")
+    void displayNameTooLongIsRejected() {
+        String name = "A".repeat(41);
+
+        assertThrows(IllegalArgumentException.class,
+                () -> new Seeker(
+                        "sam@example.com",
+                        name,
+                        "0707654321"
+                ));
+    }
+
+    @Test
+    @DisplayName("Display name with invalid characters is rejected")
+    void displayNameWithInvalidCharactersIsRejected() {
+        assertThrows(IllegalArgumentException.class,
+                () -> new Seeker(
+                        "sam@example.com",
+                        "Sam123",
+                        "0707654321"
+                ));
+    }
+
 
     // TODO (BVA): just-below / at / just-above the 10.00 minimum top-up (FR-1.3).
     // TODO (BVA): a top-up that would push the balance above 20000.00 is rejected (FR-1.3).
