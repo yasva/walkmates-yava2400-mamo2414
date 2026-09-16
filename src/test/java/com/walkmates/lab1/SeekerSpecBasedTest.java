@@ -265,6 +265,8 @@ class SeekerSpecBasedTest {
 
         assertThat(seeker.getBalance()).isEqualTo(10.01);
     }
+
+    
     // TODO (BVA): just-below / at / just-above the 5000.00 single top-up maximum (FR-1.3).
 
     @Test
@@ -281,7 +283,7 @@ class SeekerSpecBasedTest {
         assertThat(seeker.getBalance()).isEqualTo(4999.99);
     }
 
-// Exact boundary 5000.00 is already covered by topUpAtSingleMaximumIsAccepted()
+    // Exact boundary 5000.00 is already covered by topUpAtSingleMaximumIsAccepted()
 
     @Test
     @DisplayName("Top-up just above 5000.00 SEK is rejected")
@@ -296,7 +298,66 @@ class SeekerSpecBasedTest {
                 () -> seeker.addFunds(5000.01));
     }
 
-    // TODO (BVA): a top-up that would push the balance above 20000.00 is rejected (FR-1.3).
+    
+    // TODO (BVA): just-below / at / just-above the 20000.00 maximum balance (FR-1.3).
+
+    @Test
+    @DisplayName("Resulting balance just below 20000.00 SEK is accepted")
+    void balanceJustBelowMaximumIsAccepted() {
+        Seeker seeker = new Seeker(
+                "sam@example.com",
+                "Sam",
+                "0707654321"
+        );
+
+        seeker.addFunds(5000.00);
+        seeker.addFunds(5000.00);
+        seeker.addFunds(5000.00);
+        seeker.addFunds(4500.00); // balance = 19500.00
+
+        seeker.addFunds(499.99);  // resulting balance = 19999.99
+
+        assertThat(seeker.getBalance()).isEqualTo(19999.99);
+    }
+
+    @Test
+    @DisplayName("Resulting balance exactly 20000.00 SEK is accepted")
+    void balanceAtMaximumIsAccepted() {
+        Seeker seeker = new Seeker(
+                "sam@example.com",
+                "Sam",
+                "0707654321"
+        );
+
+        seeker.addFunds(5000.00);
+        seeker.addFunds(5000.00);
+        seeker.addFunds(5000.00);
+        seeker.addFunds(4500.00); // balance = 19500.00
+
+        seeker.addFunds(500.00);  // resulting balance = 20000.00
+
+        assertThat(seeker.getBalance()).isEqualTo(20000.00);
+    }
+
+    @Test
+    @DisplayName("Resulting balance above 20000.00 SEK is rejected")
+    void balanceAboveMaximumIsRejected() {
+        Seeker seeker = new Seeker(
+                "sam@example.com",
+                "Sam",
+                "0707654321"
+        );
+
+        seeker.addFunds(5000.00);
+        seeker.addFunds(5000.00);
+        seeker.addFunds(5000.00);
+        seeker.addFunds(4500.00); // balance = 19500.00
+
+        assertThrows(IllegalArgumentException.class,
+                () -> seeker.addFunds(500.01));
+    }
+
+
     // TODO (Decision table): expected fee + max-bookings for each trust tier (FR-1.2).
 
 }
