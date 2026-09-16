@@ -4,6 +4,7 @@ import com.walkmates.model.Seeker;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import com.walkmates.model.TrustTier;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -359,5 +360,26 @@ class SeekerSpecBasedTest {
 
 
     // TODO (Decision table): expected fee + max-bookings for each trust tier (FR-1.2).
+    @Test
+    @DisplayName("NEW trust tier has 1 max booking and 15% platform fee")
+    void newTrustTierHasCorrectValues() {
+        Seeker seeker = new Seeker("sam@example.com", "Sam", "0707654321");
+
+        seeker.setTrustTier(TrustTier.NEW);
+
+        assertThat(seeker.getMaxConcurrentBookings()).isEqualTo(1);
+        assertThat(seeker.getTrustTier().getPlatformFee()).isEqualTo(0.15);
+    }
+
+    @Test
+    @DisplayName("VERIFIED trust tier has 3 max bookings and 12% platform fee")
+    void verifiedTrustTierHasCorrectValues() {
+        Seeker seeker = new Seeker("sam@example.com", "Sam", "0707654321");
+
+        seeker.setTrustTier(TrustTier.VERIFIED);
+
+        assertThat(seeker.getMaxConcurrentBookings()).isEqualTo(3);
+        assertThat(seeker.getTrustTier().getPlatformFee()).isEqualTo(0.12);
+    }
 
 }
