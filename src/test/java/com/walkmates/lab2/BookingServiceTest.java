@@ -3,6 +3,7 @@ package com.walkmates.lab2;
 import com.walkmates.model.Booking;
 import com.walkmates.model.Listing;
 import com.walkmates.model.ListingType;
+import com.walkmates.model.Provider;
 import com.walkmates.model.Seeker;
 
 import com.walkmates.repository.BookingRepository;
@@ -19,9 +20,9 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 class BookingServiceTest {
 
@@ -35,7 +36,6 @@ class BookingServiceTest {
     @Test
     void newSeekerAtBookingLimitShouldBeRejected() {
 
-        // Arrange
         Seeker seeker = new Seeker(
                 "sam@example.com",
                 "Sam Lee",
@@ -73,7 +73,6 @@ class BookingServiceTest {
                 notifications
         );
 
-        // Act + Assert
         assertThatThrownBy(() ->
                 bookingService.createBooking(
                         seeker.getId(),
@@ -82,5 +81,71 @@ class BookingServiceTest {
                 )
         )
                 .hasMessageContaining("Seeker booking limit reached");
+    }
+
+    @Test
+    void successfulBookingShouldSendConfirmationNotification() {
+
+        Seeker seeker = new Seeker(
+                "sam@example.com",
+                "Sam Lee",
+                "+4671234567"
+        );
+
+        seeker.addFunds(1000.00);
+
+        Provider provider = new Provider(
+                "Dog Provider",
+                59.33,
+                18.06
+        );
+
+        Listing listing = new Listing(
+                provider.getId(),
+                "Dog walking",
+                "Walk my dog",
+                ListingType.DOG_WALK
+        );
+
+        when(seekers.findById(seeker.getId()))
+                .thenReturn(Optional.of(seeker));
+
+        when(listings.findById(listing.getId()))
+                .thenReturn(Optional.of(listing));
+
+        when(bookings.findBySeekerId(seeker.getId()))
+                .thenReturn(List.of());
+
+        when(providers.findById(provider.getId()))
+                .thenReturn(Optional.of(provider));
+
+        when(listings.findByProviderId(provider.getId()))
+                .thenReturn(List.of());
+
+        when(pricing.priceFor(
+                any(Booking.class),
+                eq(listing),
+                eq(seeker)
+        )).thenReturn(100.00);
+
+        BookingService bookingService = new BookingService(
+                seekers,
+                listings,
+                providers,
+                bookings,
+                pricing,
+                notifications
+        );
+
+        Booking booking = bookingService.createBooking(
+                seeker.getId(),
+                listing.getId(),
+                60
+        );
+
+        assertThat(booking).isNotNull();
+
+        verify(notifications)
+                .sendBookingConfirmed(seeker, booking);
     }
 }
