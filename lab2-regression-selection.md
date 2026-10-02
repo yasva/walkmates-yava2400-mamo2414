@@ -51,4 +51,4 @@ For example, the tests in `SeekerServiceTest` check successful payments, decline
 
 The tests in `MatchExplanationServiceTest` check the match explanation functionality, and `MatchControllerWebTest` checks `MatchController`, not `BookingController`. These tests do not directly exercise the changed pricing or booking code.
 
-These tests are still useful and should be included when the complete test suite is run. However, running them before the pricing and booking tests would give less useful feedback for this specific change, so they have lower priority in this regression selection.git add lab2-regression-selection.md
+These tests are still useful and should be included when the complete test suite is run. However, running them before the pricing and booking tests would give less useful feedback for this specific change, so they have lower priority in this regression selection.
