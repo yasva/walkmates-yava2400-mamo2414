@@ -47,7 +47,7 @@ class PricingCalculatorStructuralTest {
 
         assertThat(price).isEqualTo(89.60);
     }
-    
+
     /**
      * A free SHELTER_VOLUNTEER listing always costs 0.00.
      */
@@ -87,7 +87,22 @@ class PricingCalculatorStructuralTest {
         assertThat(price).isEqualTo(1075.20);
     }
 
+    @Test
+    @DisplayName("480 minute booking should not include overnight surcharge")
+    void exactly480MinutesShouldNotIncludeSurcharge() {
 
-    // TODO (BOUNDARY — this is the interesting one): a booking of exactly 480 minutes must NOT
-    //      be surcharged (FR-4.3 says strictly > 480). Write this test and see what happens.
+        Booking booking =
+                new Booking("seeker-1", "listing-1", 480);
+
+        Listing dogWalk =
+                listing(ListingType.DOG_WALK);
+
+        Seeker verifiedSeeker =
+                seeker(TrustTier.VERIFIED);
+
+        double price =
+                pricing.priceFor(booking, dogWalk, verifiedSeeker);
+
+        assertThat(price).isEqualTo(716.80);
+    }
 }
