@@ -11,6 +11,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -18,6 +19,7 @@ import java.util.Optional;
 
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -63,13 +65,49 @@ class MatchControllerWebTest {
                 .thenReturn("Rex is a good match.");
 
         mvc.perform(get("/api/match/s1/explain").param("listingId", "l1"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.seekerId").value("s1"))
-                .andExpect(jsonPath("$.listingId").value("l1"))
-                .andExpect(jsonPath("$.explanation").value("Rex is a good match."));
+            .andExpect(status().isOk())
+            .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$.seekerId").value("s1"))
+            .andExpect(jsonPath("$.listingId").value("l1"))
+            .andExpect(jsonPath("$.explanation").value("Rex is a good match."));
     }
 
-    // TODO: stub a seeker + listing and a canned explanation, assert 200 + JSON body.
-    // OPTIONAL EXTENSION: make the mocked service return the fallback text and assert the
-    // endpoint still returns 200; also cover the listing-missing 404 path separately.
+    // Activity 5.5 - Optional: Listing not found
+    @Test
+    @DisplayName("GET explain returns 404 when listing does not exist")
+    void explainReturns404WhenListingMissing() throws Exception {
+
+        Seeker seeker = new Seeker("p@example.com", "Pat", "0701112233");
+
+        when(seekers.findById("s1")).thenReturn(Optional.of(seeker));
+        when(listings.findById("missing")).thenReturn(Optional.empty());
+
+        mvc.perform(get("/api/match/s1/explain")
+                .param("listingId", "missing"))
+                .andExpect(status().isNotFound());
+    }
+
+    // Activity 5.5 - Optional: Fallback response
+    @Test
+    @DisplayName("GET explain returns 200 with fallback explanation")
+    void explainReturns200WithFallbackText() throws Exception {
+
+        Seeker seeker = new Seeker("p@example.com", "Pat", "0701112233");
+
+        Listing listing = new Listing(
+                "provider-1", "Walk Rex", "Friendly dog", ListingType.DOG_WALK);
+
+        String fallback =
+                "This DOG_WALK opportunity \"Walk Rex\" is a good fit for a NEW seeker.";
+
+        when(seekers.findById("s1")).thenReturn(Optional.of(seeker));
+        when(listings.findById("l1")).thenReturn(Optional.of(listing));
+        when(matchExplanation.explainMatch(seeker, listing))
+                .thenReturn(fallback);
+
+        mvc.perform(get("/api/match/s1/explain")
+                .param("listingId", "l1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.explanation").value(fallback));
+    }
 }
