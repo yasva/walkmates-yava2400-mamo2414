@@ -3,8 +3,8 @@
 **Lab:** 3 — Research Trends & Testing AI  
 **Pair:** Marjan Motafeghi (mamo2414), Yasaman Vallaee (yava2400)  
 **Repo:** [yasva/walkmates-yava2400-mamo2414](https://github.com/yasva/walkmates-yava2400-mamo2414)  
-**Repo commit/tag:** 
-**Research review:** 
+**Repo commit/tag:** https://github.com/yasva/walkmates-yava2400-mamo2414/commits/main/
+**Research review:** lab3-trend-review.md
 
 ---
 
