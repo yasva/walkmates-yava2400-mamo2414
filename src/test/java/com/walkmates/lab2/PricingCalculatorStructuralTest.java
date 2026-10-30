@@ -10,6 +10,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * Lab 2, Part A — structural testing for {@link PricingCalculator} (FR-4.3).
@@ -104,5 +105,47 @@ class PricingCalculatorStructuralTest {
                 pricing.priceFor(booking, dogWalk, verifiedSeeker);
 
         assertThat(price).isEqualTo(716.80);
+    }
+
+    // ---- Null input validation: each required argument is checked separately ----
+
+    @Test
+    @DisplayName("Null booking should throw IllegalArgumentException")
+    void nullBookingShouldThrowException() {
+        assertThatThrownBy(() -> pricing.priceFor(
+                null,
+                listing(ListingType.DOG_WALK),
+                seeker(TrustTier.VERIFIED)
+        ))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Booking, listing and seeker are all required");
+    }
+
+    @Test
+    @DisplayName("Null listing should throw IllegalArgumentException")
+    void nullListingShouldThrowException() {
+        Booking booking = new Booking("seeker-1", "listing-1", 60);
+
+        assertThatThrownBy(() -> pricing.priceFor(
+                booking,
+                null,
+                seeker(TrustTier.VERIFIED)
+        ))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Booking, listing and seeker are all required");
+    }
+
+    @Test
+    @DisplayName("Null seeker should throw IllegalArgumentException")
+    void nullSeekerShouldThrowException() {
+        Booking booking = new Booking("seeker-1", "listing-1", 60);
+
+        assertThatThrownBy(() -> pricing.priceFor(
+                booking,
+                listing(ListingType.DOG_WALK),
+                null
+        ))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Booking, listing and seeker are all required");
     }
 }
