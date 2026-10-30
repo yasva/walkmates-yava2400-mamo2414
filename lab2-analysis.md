@@ -14,10 +14,10 @@ We ran the existing test suite and generated the JaCoCo coverage report using:
 
 For `PricingCalculator`, the baseline coverage was:
 
-| Coverage measure | Baseline result |
-| --- | --- |
-| Line coverage | 80% (12/15 lines) |
-| Branch coverage | 50% (5/10 branches) |
+| Coverage measure | Baseline result     |
+| ---------------- | ------------------- |
+| Line coverage    | 80% (12/15 lines)   |
+| Branch coverage  | 50% (5/10 branches) |
 
 The JaCoCo report showed that the free-listing branch was not covered. The
 `baseRate == 0.0` condition had been evaluated, but the path returning `0.00`
@@ -30,11 +30,7 @@ executed the non-overnight path, but did not execute the branch that calculates
 The report also showed that the exception path for invalid null input was not
 executed.
 
-
-
-
 ### Activity 3.2 — Raise Branch Coverage
-
 
 To increase the branch coverage of `PricingCalculator`, we added tests for the branches that were not exercised by the baseline test suite.
 
@@ -49,17 +45,16 @@ Both new tests passed.
 After adding the structural tests, we generated the JaCoCo report again and compared the results with the baseline.
 
 | Coverage measure | Baseline | After Activity 3.2 |
-| --- | ---: | ---: |
-| Line coverage | 80% | 92% |
-| Branch coverage | 50% | 70% |
+| ---------------- | -------: | -----------------: |
+| Line coverage    |      80% |                92% |
+| Branch coverage  |      50% |                70% |
 
 The new tests covered:
+
 - the free-listing path
 - the overnight-surcharge path
 
 The resulting branch coverage increased from **50% to 70%**.
-
-
 
 ---
 
@@ -67,8 +62,8 @@ The resulting branch coverage increased from **50% to 70%**.
 
 According to FR-4.3, the 20% overnight surcharge applies only when the booking duration is strictly greater than 480 minutes. We added a boundary test for a booking of exactly 480 minutes.
 
-| Duration | Expected behaviour | Actual behaviour before fix |
-| --- | --- | --- |
+| Duration    | Expected behaviour     | Actual behaviour before fix     |
+| ----------- | ---------------------- | ------------------------------- |
 | 480 minutes | No overnight surcharge | Overnight surcharge was applied |
 
 We ran:
@@ -96,10 +91,17 @@ After the correction, `PricingCalculatorStructuralTest` passed with **4 tests, 0
 The final JaCoCo results for `PricingCalculator` were:
 
 | Coverage measure | Baseline | Final |
-| --- | ---: | ---: |
-| Line coverage | 80% | 92% |
-| Branch coverage | 50% | 70% |
+| ---------------- | -------: | ----: |
+| Line coverage    |      80% |   92% |
+| Branch coverage  |      50% |   70% |
 
+#### Additional Tests After Feedback
+
+Following the feedback, we added three tests to PricingCalculatorStructuralTest to verify that an IllegalArgumentException is thrown when booking, listing, or seeker is null.
+
+We ran the complete test suite using `mvn clean test jacoco:report`. All 55 tests passed with no failures or errors.
+
+The updated JaCoCo report for PricingCalculator showed 100% line coverage (15/15 lines) and 100% branch coverage (10/10 branches), compared with the previous results of 92% and 70%, respectively.
 
 ---
 
@@ -117,9 +119,9 @@ We inspected the PIT report for `PricingCalculator` and the booking-limit logic.
 
 #### Initial mutation results
 
-| Target | Mutant | Initial status | Reason |
-| --- | --- | --- | --- |
-| `PricingCalculator` | All 14 generated mutants | KILLED | The existing `PricingCalculator` tests detected all generated mutations. |
+| Target              | Mutant                     | Initial status          | Reason                                                                                                                  |
+| ------------------- | -------------------------- | ----------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| `PricingCalculator` | All 14 generated mutants   | KILLED                  | The existing `PricingCalculator` tests detected all generated mutations.                                                |
 | Booking-limit logic | Boundary change `>` ↔ `>=` | Relevant boundary fault | The existing tests did not check the case where the number of active bookings was exactly equal to the maximum allowed. |
 
 For the booking-limit logic, we added a new test called `newSeekerAtBookingLimitShouldBeRejected()`.
@@ -140,20 +142,18 @@ We ran PIT again and inspected `BookingService`. The PIT report showed that the 
 
 #### Results after additional tests
 
-| Target | Mutant | Final status | Test that killed it |
-| --- | --- | --- | --- |
-| `PricingCalculator` | All 14 generated mutants | KILLED | Existing `PricingCalculator` tests |
-| Booking-limit logic | Changed conditional boundary | KILLED | `newSeekerAtBookingLimitShouldBeRejected()` |
+| Target              | Mutant                       | Final status | Test that killed it                         |
+| ------------------- | ---------------------------- | ------------ | ------------------------------------------- |
+| `PricingCalculator` | All 14 generated mutants     | KILLED       | Existing `PricingCalculator` tests          |
+| Booking-limit logic | Changed conditional boundary | KILLED       | `newSeekerAtBookingLimitShouldBeRejected()` |
 
 **Initial mutation score:** 64/194 killed (**33%**)  
 **Final mutation score:** 73/194 killed (**38%**)
 
 The final PIT report also showed **100% test strength (18/18)** for the tested mutants in the `com.walkmates.service` package.
 
-
-
-
 ---
+
 ### Activity 4.2 — Component Isolation with Mocking
 
 We used Mockito to isolate the services from their dependencies.
@@ -162,11 +162,11 @@ We used Mockito to isolate the services from their dependencies.
 
 We tested three different payment outcomes:
 
-| Scenario | Payment result | Expected wallet behaviour | Result |
-| --- | --- | --- | --- |
-| Successful payment | Success | Wallet credited | PASS |
-| Declined payment | Failure | Wallet not credited | PASS |
-| Payment timeout | Timeout | Wallet not credited | PASS |
+| Scenario           | Payment result | Expected wallet behaviour | Result |
+| ------------------ | -------------- | ------------------------- | ------ |
+| Successful payment | Success        | Wallet credited           | PASS   |
+| Declined payment   | Failure        | Wallet not credited       | PASS   |
+| Payment timeout    | Timeout        | Wallet not credited       | PASS   |
 
 We mocked `SeekerRepository`, `PaymentService`, and `NotificationService`.
 
@@ -185,11 +185,8 @@ We mocked `SeekerRepository`, `ListingRepository`, `ProviderRepository`, `Bookin
 For a successful booking, we created the conditions needed for the booking to succeed. We then called `createBooking()` and checked that a booking was returned.
 
 We also used Mockito `verify()` to check that `notifications.sendBookingConfirmed(seeker, booking)` was called after the successful booking.
-was called after the successful booking.
 
 **Result:** PASS. The booking was successfully created and the confirmation notification was sent.
-
-
 
 ### Activity 4.3 — Regression Selection
 
@@ -206,7 +203,7 @@ We prioritized the tests in the following order:
 1. `PricingCalculatorStructuralTest.shortWalkPrice()`
 2. `PricingCalculatorStructuralTest.overnightBookingIncludesSurcharge()`
 3. `PricingCalculatorStructuralTest.exactly480MinutesShouldNotIncludeSurcharge()`
-4. `PricingCalculatorStructuralTest.freeListingShouldCostZero()`
+4. `PricingCalculatorStructuralTest.shelterVolunteerListingIsFree()`
 5. `BookingServiceTest.successfulBookingShouldSendConfirmationNotification()`
 6. `BookingServiceTest.newSeekerAtBookingLimitShouldBeRejected()`
 
@@ -220,4 +217,18 @@ However, these tests are not unnecessary in general. They are still included whe
 
 An important limitation of the selected existing tests is that they do not directly test the new weekend surcharge. They mainly verify that the existing pricing and booking behaviour is preserved. New feature-specific tests would therefore still be needed to verify the Saturday/Sunday surcharge itself.
 
+#### Gap Tests
 
+To verify the proposed weekend surcharge, we would add tests for a paid booking starting on Saturday, a paid booking starting on Sunday, and a paid booking starting on a normal weekday. These tests would check that the 10% surcharge is applied only on weekends.
+
+We would also test a booking that qualifies for both the weekend and overnight surcharges, a free SHELTER_VOLUNTEER listing on a weekend, and a booking without scheduledStartDate to confirm that the previous pricing behaviour is preserved.
+
+Finally, we would add a test using the real PricingCalculator through BookingService to verify that scheduledStartDate is passed correctly to the price calculation.
+
+#### Residual Risk
+
+The existing regression tests use bookings without scheduledStartDate, and the successful BookingService test mocks PricingCalculator. Therefore, these tests could pass even if the new weekend surcharge is not applied correctly or the scheduled date is not passed through the booking flow.
+
+There is also a risk that the weekend surcharge interacts incorrectly with the existing overnight surcharge or is applied to free listings.
+
+Until the proposed gap tests are implemented and executed, the new weekend pricing behaviour remains unverified.
